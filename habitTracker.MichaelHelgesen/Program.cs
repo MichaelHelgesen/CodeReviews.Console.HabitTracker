@@ -35,7 +35,24 @@ using Microsoft.Data.Sqlite;
 using var connection = new SqliteConnection("Data Source=hello.db");
 
 connection.Open();
-const int  id = 1;
+const int  id = 3;
+
+// 1. Lag tabellen dersom den ikke finnes fra før
+var createTableCmd = connection.CreateCommand();
+createTableCmd.CommandText = @"
+    CREATE TABLE IF NOT EXISTS brukere (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        navn TEXT NOT NULL UNIQUE
+    );";
+createTableCmd.ExecuteNonQuery();
+
+using var test = connection.CreateCommand();
+test.CommandText = """
+    INSERT INTO brukere (navn, id)
+    VALUES ('Pere', '3');
+""";
+test.ExecuteNonQuery();
+
 using var command = connection.CreateCommand();
 command.CommandText = """
     SELECT navn
