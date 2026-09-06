@@ -32,34 +32,42 @@ TIPS
 */
 using Microsoft.Data.Sqlite;
 
-using var connection = new SqliteConnection("Data Source=hello.db");
+using var connection = new SqliteConnection("Data Source=habits.db"); // Nytt objekt, med parameter som forteller hvor databasen skal lagres.
 
-connection.Open();
+try // Sjekke om tilkoblingen til databasen kan åpnes, og håndtere eventuelle feil.
+{
+    connection.Open(); // Åpne tilkoblingen til databasen.
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error opening database connection: {ex.Message}");
+    return; // Exit the program if the connection fails.
+}
+
 const int  id = 3;
 
-// 1. Lag tabellen dersom den ikke finnes fra før
-var createTableCmd = connection.CreateCommand();
+using var createTableCmd = connection.CreateCommand(); // CREATE TABLE IF NOT EXISTS sørger for at tabellen kun opprettes hvis den ikke allerede eksisterer.
 createTableCmd.CommandText = @"
     CREATE TABLE IF NOT EXISTS brukere (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         navn TEXT NOT NULL UNIQUE
     );";
-createTableCmd.ExecuteNonQuery();
+createTableCmd.ExecuteNonQuery(); // Utføres med en gang. 
 
 using var test = connection.CreateCommand();
 test.CommandText = """
     INSERT INTO brukere (navn, id)
-    VALUES ('Pere', '3');
-""";
-test.ExecuteNonQuery();
+    VALUES ('Peref', '4');
+"""; // Unike verdier for navn og id.
+test.ExecuteNonQuery(); // Utføres med en gang.
 
-using var command = connection.CreateCommand();
+using var command = connection.CreateCommand(); // Denne kommandoen utføres først når ExecuteReader() kalles.
 command.CommandText = """
     SELECT navn
     FROM brukere
     WHERE id = $id
 """;
-command.Parameters.AddWithValue("$id", id);
+command.Parameters.AddWithValue("$id", id); // Parameter hjelper med å unngå SQL-injection og gjør koden mer lesbar.
 
 using var reader = command.ExecuteReader();
 
