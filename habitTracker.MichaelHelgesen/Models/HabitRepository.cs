@@ -7,10 +7,10 @@
     {
         private static SqliteConnection Connection()
         {
-            var connection = new SqliteConnection("Data Source=hello.db");
+            var connection = new SqliteConnection("Data Source=habits.db");
             return connection;
         }
-        
+
         internal static void CreateTable()
         {
             using var connection = Connection();
