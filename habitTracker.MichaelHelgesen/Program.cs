@@ -30,42 +30,10 @@ TIPS
 - You can keep all of the code in one single class if you wish. We'll deal with Object Oriented Programming in the next project
 - Don't forget the user input's validation: Check for incorrect dates. What happens if a menu option is chosen that's not available? What happens if the users input a string instead of a number?
 */
-using Microsoft.Data.Sqlite;
 
-using var connection = new SqliteConnection("Data Source=hello.db");
+using habitTracker.MichaelHelgesen.Models;
 
-connection.Open();
-const int  id = 3;
 
-// 1. Lag tabellen dersom den ikke finnes fra før
-var createTableCmd = connection.CreateCommand();
-createTableCmd.CommandText = @"
-    CREATE TABLE IF NOT EXISTS brukere (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        navn TEXT NOT NULL UNIQUE
-    );";
-createTableCmd.ExecuteNonQuery();
-
-using var test = connection.CreateCommand();
-test.CommandText = """
-    INSERT INTO brukere (navn, id)
-    VALUES ('Pere', '3');
-""";
-test.ExecuteNonQuery();
-
-using var command = connection.CreateCommand();
-command.CommandText = """
-    SELECT navn
-    FROM brukere
-    WHERE id = $id
-""";
-command.Parameters.AddWithValue("$id", id);
-
-using var reader = command.ExecuteReader();
-
-while (reader.Read())
-{
-    var name = reader.GetString(0);
-
-    Console.WriteLine($"Hello, {name}!");
-}
+HabitRepository.CreateTable();
+//HabitRepository.CreateUser("Martin", 5);
+HabitRepository.CheckForUsers(5);
