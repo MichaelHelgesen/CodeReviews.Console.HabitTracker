@@ -27,12 +27,15 @@
         internal static void CreateUser(string name, int ID)
         {
             using var connection = Connection();
-            using var test = connection.CreateCommand();
-            test.CommandText = $"""
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = $"""
                 INSERT INTO brukere (navn, id)
-                VALUES ('{name}', {ID}); // Må være unike her.
+                VALUES ($name, $id);
             """;
-            test.ExecuteNonQuery();
+            command.Parameters.AddWithValue("$id", ID);
+            command.Parameters.AddWithValue("$name", name);
+            command.ExecuteNonQuery();
         }
 
         internal static void CheckForUsers(int ID)

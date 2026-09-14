@@ -35,5 +35,13 @@ using habitTracker.MichaelHelgesen.Models;
 
 
 HabitRepository.CreateTable();
-//HabitRepository.CreateUser("Martin", 5);
+try
+{
+    HabitRepository.CreateUser("petett", 7);
+}
+catch (System.Exception ex)
+{
+    Console.WriteLine("User og ID aldready exist");
+    Console.WriteLine(ex.Message);
+}
 HabitRepository.CheckForUsers(5);
