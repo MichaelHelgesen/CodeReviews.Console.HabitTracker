@@ -17,24 +17,27 @@
             connection.Open();
             var createTableCmd = connection.CreateCommand();
             createTableCmd.CommandText = @"
-                CREATE TABLE IF NOT EXISTS brukere (
+                CREATE TABLE IF NOT EXISTS habits (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                navn TEXT NOT NULL UNIQUE
+                habitNormalized TEXT NOT NULL,
+                habitOriginal TEXT NOT NULL,
+                date TEXT NOT NULL
             );";
             createTableCmd.ExecuteNonQuery();
         }
 
-        internal static void CreateUser(string name, int ID)
+        internal static void CreateHabit(string habitNormalized, string habitOriginal, string date)
         {
             using var connection = Connection();
             connection.Open();
             using var command = connection.CreateCommand();
-            command.CommandText = $"""
-                INSERT INTO brukere (navn, id)
-                VALUES ($name, $id);
+            command.CommandText = """
+                INSERT INTO habits (habitNormalized, habitOriginal, date)
+                VALUES ($habitNormalized, $habitOriginal, $date);
             """;
-            command.Parameters.AddWithValue("$id", ID);
-            command.Parameters.AddWithValue("$name", name);
+            command.Parameters.AddWithValue("$habitNormalized", habitNormalized);
+            command.Parameters.AddWithValue("$habitOriginal", habitOriginal);
+            command.Parameters.AddWithValue("$date", date);
             command.ExecuteNonQuery();
         }
 
@@ -43,8 +46,8 @@
             using var connection = Connection();
             using var command = connection.CreateCommand();
             command.CommandText = """
-                SELECT navn
-                FROM brukere
+                SELECT habit
+                FROM habits
                 WHERE id = $id
             """;
             command.Parameters.AddWithValue("$id", ID);

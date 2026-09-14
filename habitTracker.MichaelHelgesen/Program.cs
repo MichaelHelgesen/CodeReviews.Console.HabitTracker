@@ -35,13 +35,10 @@ using habitTracker.MichaelHelgesen.Models;
 
 
 HabitRepository.CreateTable();
-try
-{
-    HabitRepository.CreateUser("petett", 7);
-}
-catch (System.Exception ex)
-{
-    Console.WriteLine("User og ID aldready exist");
-    Console.WriteLine(ex.Message);
-}
-HabitRepository.CheckForUsers(5);
+
+var test = new Habit{ID = "1", Title = "test"};
+
+HabitRepository.CreateHabit(test.Title, test.Title, test.DateTimeNow.ToString());
+
+
+
