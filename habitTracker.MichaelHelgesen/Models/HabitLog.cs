@@ -2,7 +2,7 @@ namespace habitTracker.MichaelHelgesen.Models;
 
 internal class HabitLog
 {
-    internal DateTime DateTimeNow { get; set; } = DateTime.Now;
+    internal string DateTimeNow { get; set; } = DateTimeOffset.Now.ToString();
     internal required int HabitID { get; set; }
     internal int ID { get; set; }
 }

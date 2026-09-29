@@ -48,3 +48,14 @@ foreach (var item in list)
 {
     Console.WriteLine(item);    
 }
+
+var habitLog = new HabitLog{HabitID = 2};
+
+HabitRepository.CreateHabitLog(habitLog.DateTimeNow, habitLog.HabitID);
+
+var loglist = HabitRepository.GetHabitLog(2);
+
+foreach (var item in loglist)
+{
+    Console.WriteLine(item.HabitID);    
+}

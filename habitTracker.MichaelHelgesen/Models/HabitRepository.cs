@@ -47,6 +47,21 @@
             command.ExecuteNonQuery();
         }
 
+        internal static void CreateHabitLog(string date, int habit_id)
+        {
+            using var connection = Connection();
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = """
+                INSERT INTO habitLog (date, habit_id)
+                VALUES ($date, $habit_id);
+            """;
+            command.Parameters.AddWithValue("$date", date);
+            command.Parameters.AddWithValue("$habit_id", habit_id);
+            
+            command.ExecuteNonQuery();
+        }
+
         internal static void DeleteHabit(int id)
         {
             using var connection = Connection();
@@ -87,6 +102,34 @@
             {
                 var title = reader.GetString(0);
                 HabitList.Add(title);
+            }
+            return HabitList;
+        }
+
+        internal static List<HabitLog> GetHabitLog(int habitId)
+        {
+            var HabitList = new List<HabitLog>();
+            using var connection = Connection();
+            using var command = connection.CreateCommand();
+
+            command.CommandText = """
+                SELECT date, id, habit_id
+                FROM habitLog
+                WHERE habit_id = $id
+            """;
+            command.Parameters.AddWithValue("$id", habitId);
+            
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                var HabitLog = new HabitLog
+                {
+                  DateTimeNow =  reader.GetString(0),
+                  ID = reader.GetInt32(1),
+                  HabitID = reader.GetInt32(2)
+                };
+                HabitList.Add(HabitLog);
             }
             return HabitList;
         }
