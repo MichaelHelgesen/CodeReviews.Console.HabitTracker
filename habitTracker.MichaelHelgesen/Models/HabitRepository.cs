@@ -33,7 +33,7 @@
             createHabitLogTableCmd.ExecuteNonQuery();
         }
 
-        internal static void CreateHabit(string habitNormalized, string habitOriginal)
+        internal static long CreateHabit(string habitNormalized, string habitOriginal)
         {
             using var connection = Connection();
             connection.Open();
@@ -41,13 +41,14 @@
             command.CommandText = """
                 INSERT INTO habits (habitNormalized, habitOriginal)
                 VALUES ($habitNormalized, $habitOriginal);
+                SELECT LAST_INSERT_ROWID();
             """;
             command.Parameters.AddWithValue("$habitNormalized", habitNormalized);
             command.Parameters.AddWithValue("$habitOriginal", habitOriginal);
-            command.ExecuteNonQuery();
+            return (long)command.ExecuteScalar();
         }
 
-        internal static void CreateHabitLog(string date, int habit_id)
+        internal static void CreateHabitLog(string date, long habit_id)
         {
             using var connection = Connection();
             connection.Open();
@@ -62,7 +63,7 @@
             command.ExecuteNonQuery();
         }
 
-        internal static void DeleteHabit(int id)
+        internal static void DeleteHabit(long id)
         {
             using var connection = Connection();
             connection.Open();
@@ -72,7 +73,7 @@
             """;
         }
 
-        internal static void GetHabitByID(int ID)
+        internal static void GetHabitByID(long ID)
         {
             using var connection = Connection();
             using var command = connection.CreateCommand();
@@ -106,7 +107,23 @@
             return HabitList;
         }
 
-        internal static List<HabitLog> GetHabitLog(int habitId)
+        internal static long CheckForData()
+        {
+            long numberOfDatabaseRows;
+            using var connection = Connection();
+            using var command = connection.CreateCommand();
+
+            command.CommandText = """
+                SELECT COUNT(*) 
+                FROM habits
+            """;
+            
+            connection.Open();
+            numberOfDatabaseRows = (long)command.ExecuteScalar();
+            return numberOfDatabaseRows;
+        }
+
+        internal static List<HabitLog> GetHabitLog(long habitId)
         {
             var HabitList = new List<HabitLog>();
             using var connection = Connection();

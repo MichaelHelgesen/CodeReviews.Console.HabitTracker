@@ -2,11 +2,16 @@ namespace habitTracker.MichaelHelgesen.Models;
 
 internal class SeedTestData
 {
-    void CreateTestData()
+    static internal void CreateTestData()
     {
         var testHabits = new[] { "trening", "lesing", "meditasjon" };
         foreach (var name in testHabits) { 
-            HabitRepository.CreateHabit(name, name); 
+            var habitID = HabitRepository.CreateHabit(name, name);
+            int logDataEntries = 3;
+            for (int i = 0; i < logDataEntries; i++)
+            {
+                HabitRepository.CreateHabitLog(DateTimeOffset.Now.ToString(), habitID);
+            }
         }
     }
 }

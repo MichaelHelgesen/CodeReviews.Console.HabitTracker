@@ -36,6 +36,12 @@ using habitTracker.MichaelHelgesen.Models;
 
 HabitRepository.CreateTable();
 
+if (HabitRepository.CheckForData() < 3)
+{
+    Console.WriteLine("Creating test data");
+    SeedTestData.CreateTestData();
+}
+
 //var test = new Habit{Title = "test3"};
 
 //HabitRepository.CreateHabit(test.Title, test.Title);
@@ -49,13 +55,14 @@ foreach (var item in list)
     Console.WriteLine(item);    
 }
 
-var habitLog = new HabitLog{HabitID = 2};
+//var habitLog = new HabitLog{HabitID = 2};
 
-HabitRepository.CreateHabitLog(habitLog.DateTimeNow, habitLog.HabitID);
+//HabitRepository.CreateHabitLog(habitLog.DateTimeNow, habitLog.HabitID);
 
 var loglist = HabitRepository.GetHabitLog(2);
 
 foreach (var item in loglist)
 {
-    Console.WriteLine(item.HabitID);    
+    Console.WriteLine(item.DateTimeNow);    
 }
+
