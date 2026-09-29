@@ -32,14 +32,16 @@ TIPS
 */
 
 using habitTracker.MichaelHelgesen.Models;
+using habitTracker.MichaelHelgesen.Controllers;
 
+MenuController.RenderMainMenu();
 
 HabitRepository.CreateTable();
 
 if (HabitRepository.CheckForData() < 3)
 {
     Console.WriteLine("Creating test data");
-    SeedTestData.CreateTestData();
+    CreateTestData();
 }
 
 //var test = new Habit{Title = "test3"};
@@ -66,3 +68,15 @@ foreach (var item in loglist)
     Console.WriteLine(item.DateTimeNow);    
 }
 
+static void CreateTestData()
+{
+    var testHabits = new[] { "trening", "lesing", "meditasjon" };
+    foreach (var name in testHabits) { 
+        var habitID = HabitRepository.CreateHabit(name, name);
+        int logDataEntries = 3;
+        for (int i = 0; i < logDataEntries; i++)
+        {
+            HabitRepository.CreateHabitLog(DateTimeOffset.Now.ToString(), habitID);
+        }
+    }
+}
