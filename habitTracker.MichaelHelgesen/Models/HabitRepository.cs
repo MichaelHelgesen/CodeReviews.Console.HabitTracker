@@ -73,6 +73,20 @@
             """;
         }
 
+        internal static long GetHabitByNormalizedName(string habitNormalized)
+        {
+            using var connection = Connection();
+            using var command = connection.CreateCommand();
+            command.CommandText = """
+                SELECT id
+                FROM habits
+                WHERE habitNormalized = $habitNormalized
+            """;
+            command.Parameters.AddWithValue("$habitNormalized", habitNormalized);
+            connection.Open();
+            return (long)command.ExecuteScalar();
+        }
+
         internal static void GetHabitByID(long ID)
         {
             using var connection = Connection();

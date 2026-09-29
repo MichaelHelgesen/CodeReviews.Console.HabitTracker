@@ -7,7 +7,7 @@ internal class AppController()
     {
         HabitRepository.CreateTable();
         CreateTestData();
-        int uniqueHabits = HabitRepository.GetUniqueHabits().Count();
+        /*int uniqueHabits = HabitRepository.GetUniqueHabits().Count();*/ // Vise beskjed dersom det ikke er noen vaner.
         MenuController.RenderMainMenu();
     }
 
