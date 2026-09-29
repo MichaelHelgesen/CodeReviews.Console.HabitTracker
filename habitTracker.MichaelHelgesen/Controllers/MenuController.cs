@@ -12,6 +12,14 @@ class MenuController
         AnsiConsole.MarkupLine("[bold blue]Welcome[/] to [green]the Habit Tracker[/]!");
 
         var mainMenuChoice = DisplayMainMenu();
+
+        switch (mainMenuChoice)
+        {
+            case AppChoice.View:
+                DisplayHabits();
+                break;
+        }
+        
     }
 
     private static AppChoice DisplayMainMenu()
@@ -23,6 +31,17 @@ class MenuController
             .Title("Please choose [green]an option[/] from the meny below")
             .UseConverter(item => GenerateMainMenuItem(item))
             .AddChoices(menuChoices));
+        return menuChoice;
+    }
+
+    private static string DisplayHabits()
+    {
+        var habits = HabitRepository.GetUniqueHabits();
+
+        var menuChoice = AnsiConsole.Prompt(
+        new SelectionPrompt<string>()
+            .Title("Please choose [green]a habit[/] from the list below")
+            .AddChoices(habits));
         return menuChoice;
     }
         private static List<AppChoice> GenerateMainMenuChoices()

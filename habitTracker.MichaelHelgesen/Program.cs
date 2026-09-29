@@ -30,53 +30,5 @@ TIPS
 [] You can keep all of the code in one single class if you wish. We'll deal with Object Oriented Programming in the next project
 [] Don't forget the user input's validation: Check for incorrect dates. What happens if a menu option is chosen that's not available? What happens if the users input a string instead of a number?
 */
-
-using habitTracker.MichaelHelgesen.Models;
 using habitTracker.MichaelHelgesen.Controllers;
-
-MenuController.RenderMainMenu();
-
-HabitRepository.CreateTable();
-
-if (HabitRepository.CheckForData() < 3)
-{
-    Console.WriteLine("Creating test data");
-    CreateTestData();
-}
-
-//var test = new Habit{Title = "test3"};
-
-//HabitRepository.CreateHabit(test.Title, test.Title);
-
-
-
-var list = HabitRepository.GetUniqueHabits();
-
-foreach (var item in list)
-{
-    Console.WriteLine(item);    
-}
-
-//var habitLog = new HabitLog{HabitID = 2};
-
-//HabitRepository.CreateHabitLog(habitLog.DateTimeNow, habitLog.HabitID);
-
-var loglist = HabitRepository.GetHabitLog(2);
-
-foreach (var item in loglist)
-{
-    Console.WriteLine(item.DateTimeNow);    
-}
-
-static void CreateTestData()
-{
-    var testHabits = new[] { "trening", "lesing", "meditasjon" };
-    foreach (var name in testHabits) { 
-        var habitID = HabitRepository.CreateHabit(name, name);
-        int logDataEntries = 3;
-        for (int i = 0; i < logDataEntries; i++)
-        {
-            HabitRepository.CreateHabitLog(DateTimeOffset.Now.ToString(), habitID);
-        }
-    }
-}
+AppController.RunApp();
