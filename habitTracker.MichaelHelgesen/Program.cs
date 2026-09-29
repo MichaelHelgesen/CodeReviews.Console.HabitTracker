@@ -36,10 +36,15 @@ using habitTracker.MichaelHelgesen.Models;
 
 HabitRepository.CreateTable();
 
-var test = new Habit{Title = "test"};
+//var test = new Habit{Title = "test3"};
 
-HabitRepository.CreateHabit(test.Title, test.Title, test.DateTime.ToString());
+//HabitRepository.CreateHabit(test.Title, test.Title);
 
 
 
-HabitRepository.SelectUniqueHabits();
+var list = HabitRepository.GetUniqueHabits();
+
+foreach (var item in list)
+{
+    Console.WriteLine(item);    
+}

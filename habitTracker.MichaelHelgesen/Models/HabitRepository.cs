@@ -14,29 +14,36 @@
         {
             using var connection = Connection();
             connection.Open();
-            var createTableCmd = connection.CreateCommand();
-            createTableCmd.CommandText = @"
+            var createHabitTableCmd = connection.CreateCommand();
+            var createHabitLogTableCmd = connection.CreateCommand();
+            createHabitTableCmd.CommandText = @"
                 CREATE TABLE IF NOT EXISTS habits (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 habitNormalized TEXT NOT NULL,
-                habitOriginal TEXT NOT NULL,
-                date TEXT NOT NULL
+                habitOriginal TEXT NOT NULL
             );";
-            createTableCmd.ExecuteNonQuery();
+            createHabitLogTableCmd.CommandText = @"
+                CREATE TABLE IF NOT EXISTS habitlog (
+                date TEXT NOT NULL,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                habit_id INTEGER NOT NULL,
+                FOREIGN KEY (habit_id) REFERENCES habits(id)
+            );";
+            createHabitTableCmd.ExecuteNonQuery();
+            createHabitLogTableCmd.ExecuteNonQuery();
         }
 
-        internal static void CreateHabit(string habitNormalized, string habitOriginal, string date)
+        internal static void CreateHabit(string habitNormalized, string habitOriginal)
         {
             using var connection = Connection();
             connection.Open();
             using var command = connection.CreateCommand();
             command.CommandText = """
-                INSERT INTO habits (habitNormalized, habitOriginal, date)
-                VALUES ($habitNormalized, $habitOriginal, $date);
+                INSERT INTO habits (habitNormalized, habitOriginal)
+                VALUES ($habitNormalized, $habitOriginal);
             """;
             command.Parameters.AddWithValue("$habitNormalized", habitNormalized);
             command.Parameters.AddWithValue("$habitOriginal", habitOriginal);
-            command.Parameters.AddWithValue("$date", date);
             command.ExecuteNonQuery();
         }
 
@@ -50,7 +57,7 @@
             """;
         }
 
-        internal static void CheckForHabit(int ID)
+        internal static void GetHabitByID(int ID)
         {
             using var connection = Connection();
             using var command = connection.CreateCommand();
@@ -63,15 +70,25 @@
             Execute(connection, command);
         }
 
-        internal static void SelectUniqueHabits()
+        internal static List<string> GetUniqueHabits()
         {
+            var HabitList = new List<string>();
             using var connection = Connection();
             using var command = connection.CreateCommand();
+
             command.CommandText = """
                 SELECT DISTINCT habitNormalized
                 FROM habits
             """;
-            Execute(connection, command);
+            
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                var title = reader.GetString(0);
+                HabitList.Add(title);
+            }
+            return HabitList;
         }
 
         internal static void Execute(SqliteConnection connection, SqliteCommand command)
@@ -82,20 +99,6 @@
             {
                 var habit = reader.GetString(0);
                 Console.WriteLine($"Hello, {habit}!");
-            }
-        }
-
-        internal static void HabitMapping(SqliteConnection connection, SqliteCommand command)
-        {
-            connection.Open();
-            using var reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                var id = reader.GetInt32(0);
-                var title = reader.GetString(1);
-                var date = reader.GetDateTimeOffset(3);
-                var habit = new Habit{ID = id, Title = title, DateTime = date};
-                Console.WriteLine(habit.DateTime);
             }
         }
     }
