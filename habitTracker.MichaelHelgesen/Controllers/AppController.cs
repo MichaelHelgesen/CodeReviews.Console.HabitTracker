@@ -20,7 +20,7 @@ internal class AppController()
             int logDataEntries = 3;
             for (int i = 0; i < logDataEntries; i++)
             {
-                HabitRepository.CreateHabitLog(DateTimeOffset.Now.ToString(), habitID);
+                HabitRepository.CreateHabitLog(DateTimeOffset.Now.ToString(), habitID, 99);
             }
         }
     }

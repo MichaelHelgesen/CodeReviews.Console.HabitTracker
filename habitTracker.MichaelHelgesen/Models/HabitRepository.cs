@@ -26,6 +26,7 @@
                 CREATE TABLE IF NOT EXISTS habitlog (
                 date TEXT NOT NULL,
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ocurrence INT,
                 habit_id INTEGER NOT NULL,
                 FOREIGN KEY (habit_id) REFERENCES habits(id)
             );";
@@ -48,17 +49,18 @@
             return (long)command.ExecuteScalar();
         }
 
-        internal static void CreateHabitLog(string date, long habit_id)
+        internal static void CreateHabitLog(string date, long habit_id, int ocurrence)
         {
             using var connection = Connection();
             connection.Open();
             using var command = connection.CreateCommand();
             command.CommandText = """
-                INSERT INTO habitLog (date, habit_id)
-                VALUES ($date, $habit_id);
+                INSERT INTO habitLog (date, habit_id, ocurrence)
+                VALUES ($date, $habit_id, $ocurrence);
             """;
             command.Parameters.AddWithValue("$date", date);
             command.Parameters.AddWithValue("$habit_id", habit_id);
+            command.Parameters.AddWithValue("$ocurrence", ocurrence);
             
             command.ExecuteNonQuery();
         }
@@ -144,7 +146,7 @@
             using var command = connection.CreateCommand();
 
             command.CommandText = """
-                SELECT date, id, habit_id
+                SELECT date, id, habit_id, ocurrence
                 FROM habitLog
                 WHERE habit_id = $id
             """;
@@ -154,11 +156,13 @@
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
+                Console.WriteLine(reader.GetString(2));
                 var HabitLog = new HabitLog
                 {
                   DateTimeNow =  reader.GetString(0),
                   ID = reader.GetInt32(1),
-                  HabitID = reader.GetInt32(2)
+                  HabitID = reader.GetInt32(2),
+                  Ocurrence = reader.GetInt32(3)
                 };
                 HabitList.Add(HabitLog);
             }
