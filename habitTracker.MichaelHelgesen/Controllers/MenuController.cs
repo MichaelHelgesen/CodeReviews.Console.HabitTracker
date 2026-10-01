@@ -89,7 +89,9 @@ class MenuController
         (standardDato, antall) = SpørOmRegistrering(null, null);
         do
         {
+
             //(standardDato, antall) = SpørOmRegistrering(standardDato, antall);
+            Console.WriteLine($"Your date: {standardDato}, your ocurrance: {antall}");
             var menuChoice = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
            .Title("choose")
@@ -101,6 +103,9 @@ class MenuController
             else if (menuChoice == "Cancel")
             {
                 return;
+            } else
+            {
+                (standardDato, antall) = SpørOmRegistrering(standardDato, antall);
             }
         } while (!confirm);
     }
