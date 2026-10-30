@@ -25,6 +25,9 @@ class MenuController
                 case AppChoice.LogHabit:
                     DisplayHabitsForLog("Choose a habit to log");
                     break;
+                default:
+                    Environment.Exit(0);
+                    break;
             }
         }
     }
@@ -54,10 +57,12 @@ class MenuController
         {
             return;
         }
+
         else
         {
             RenderHabitMenu(menuChoice);
         }
+
     }
 
     private static void DisplayHabitsForLog(string message)
@@ -83,27 +88,81 @@ class MenuController
     {
         var habitID = HabitRepository.GetHabitByNormalizedName(habitNormalized);
         var logs = HabitRepository.GetHabitLog(habitID);
+
+        Console.WriteLine($"Registrer {habitNormalized}\n");
+
         bool confirm = false;
         DateTime standardDato;
         int antall;
+
         (standardDato, antall) = SpørOmRegistrering(null, null);
         do
         {
 
-            //(standardDato, antall) = SpørOmRegistrering(standardDato, antall);
             Console.WriteLine($"Your date: {standardDato}, your ocurrance: {antall}");
             var menuChoice = AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
-           .Title("choose")
-           .AddChoices(["Confirm", "Cancel", "Edit"]));
+                new SelectionPrompt<string>()
+                    .Title("choose")
+                    .AddChoices(["Confirm", "Cancel", "Edit"]));
             if (menuChoice == "Confirm")
             {
+                HabitRepository.CreateHabitLog(standardDato.ToString(), habitID, antall);
                 confirm = true;
             }
             else if (menuChoice == "Cancel")
             {
                 return;
-            } else
+            }
+            else
+            {
+                (standardDato, antall) = SpørOmRegistrering(standardDato, antall);
+            }
+        } while (!confirm);
+    }
+
+    private static void RenderRegisterLogMenu2(HabitLog logEntry)
+    {
+        //var habitID = HabitRepository.GetHabitByNormalizedName(habitNormalized);
+        //var logs = HabitRepository.GetHabitLog(habitID);
+
+        //Console.WriteLine($"Registrer {habitNormalized}\n");
+        HabitLog entryCopy = new()
+        {
+            ID = logEntry.ID,
+            DateTimeNow = logEntry.DateTimeNow,
+            Ocurrence = logEntry.Ocurrence,
+            HabitID = logEntry.HabitID
+        };
+        bool confirm = false;
+        if (DateTime.TryParse(entryCopy.DateTimeNow, out DateTime standardDato))
+        {
+            Console.WriteLine(standardDato);
+        }
+        else
+        {
+            // Strengen hadde feil format
+        }
+        int antall = entryCopy.Ocurrence;
+
+        //(standardDato, antall) = SpørOmRegistrering(null, null);
+        do
+        {
+
+            Console.WriteLine($"Your date: {standardDato}, your ocurrance: {antall}, ID {entryCopy.ID}");
+            var menuChoice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("choose")
+                    .AddChoices(["Confirm", "Cancel", "Edit"]));
+            if (menuChoice == "Confirm")
+            {
+                HabitRepository.UpdateHabitLog(standardDato.ToString(), entryCopy.ID, antall);
+                confirm = true;
+            }
+            else if (menuChoice == "Cancel")
+            {
+                return;
+            }
+            else
             {
                 (standardDato, antall) = SpørOmRegistrering(standardDato, antall);
             }
@@ -115,7 +174,7 @@ class MenuController
         var dagsDato = DateTime.Now;
 
         string datoPromptTekst = standardDato != null
-        ? "Oppgi dato:"
+        ? "Oppgi dato (Enter for tidligere registrert):"
         : "Oppgi dato (Enter for i dag):";
 
         var dato = AnsiConsole.Prompt(
@@ -127,7 +186,7 @@ class MenuController
             : ValidationResult.Error("Dato kan ikke være i fremtiden")));
 
         string antallPromptTekst = standardAntall != null
-        ? "Hvor mange ganger?"
+        ? "Hvor mange ganger? (Enter for tidligere registrert):"
         : "Hvor mange ganger (Enter for 1):";
 
         var antallPrompt = new TextPrompt<int>(antallPromptTekst)
@@ -149,17 +208,29 @@ class MenuController
 
     private static void RenderHabitMenu(string habitNormalized)
     {
-        var habitID = HabitRepository.GetHabitByNormalizedName(habitNormalized);
-        var logs = HabitRepository.GetHabitLog(habitID);
 
-        var menuChoice = AnsiConsole.Prompt(
-        new SelectionPrompt<HabitLog>()
-            .Title("Please choose [green]an option[/] from the meny below")
-            .UseConverter(item => item switch
-                {
-                    _ => $"- {habitNormalized}: {item.Ocurrence}"
-                })
-            .AddChoices(logs));
+        while (true)
+        {
+            var habitID = HabitRepository.GetHabitByNormalizedName(habitNormalized);
+            var logs = HabitRepository.GetHabitLog(habitID);
+
+            var menuChoice = AnsiConsole.Prompt(
+                new SelectionPrompt<HabitLog>()
+                    .Title("Please choose [green]an option[/] from the meny below")
+                    .UseConverter(item => item switch
+                        {
+                            _ => $"- {habitNormalized}: {item.DateTimeNow} - {item.Ocurrence}"
+                        })
+                    .AddChoices(logs));
+            if (menuChoice != null)
+            {
+                DateTime standardDato = DateTime.Parse(menuChoice.DateTimeNow);
+                int antall = menuChoice.Ocurrence;
+                //(standardDato, antall) = SpørOmRegistrering(standardDato, antall);
+                //RenderRegisterLogMenu(habitNormalized);
+                RenderRegisterLogMenu2(menuChoice);
+            }
+        }
     }
 
     private static List<AppChoice> GenerateMainMenuChoices()
@@ -173,7 +244,7 @@ class MenuController
         return item switch
         {
             AppChoice.LogHabit => "✅  Log a habit",
-            AppChoice.AddHabit => "▶📝  Register a new habit",
+            AppChoice.AddHabit => "📝  Register a new habit",
             AppChoice.ViewHabits => "📃  View habits",
             _ => item.ToString()
         };

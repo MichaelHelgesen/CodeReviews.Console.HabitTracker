@@ -65,6 +65,23 @@
             command.ExecuteNonQuery();
         }
 
+        internal static void UpdateHabitLog(string date, long ID, int ocurrence)
+        {
+            using var connection = Connection();
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = """
+                UPDATE habitLog
+                SET date = $date, ocurrence = $ocurrence
+                WHERE id = $id
+            """;
+            command.Parameters.AddWithValue("$date", date);
+            command.Parameters.AddWithValue("$id", ID);
+            command.Parameters.AddWithValue("$ocurrence", ocurrence);
+
+            Execute(connection, command);
+        }
+
         internal static void DeleteHabit(long id)
         {
             using var connection = Connection();
@@ -80,7 +97,7 @@
             using var connection = Connection();
             using var command = connection.CreateCommand();
             command.CommandText = """
-                SELECT id
+                SELECT id 
                 FROM habits
                 WHERE habitNormalized = $habitNormalized
             """;
@@ -156,7 +173,6 @@
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
-                Console.WriteLine(reader.GetString(2));
                 var HabitLog = new HabitLog
                 {
                   DateTimeNow =  reader.GetString(0),

@@ -4,7 +4,8 @@ enum AppChoice
 {
     LogHabit,
     AddHabit,
-    ViewHabits
+    ViewHabits,
+    Exit
 }
 
 enum HabitChoice
@@ -12,6 +13,7 @@ enum HabitChoice
     Add,
     Edit,
     Delete,
+    Back
 }
 
 enum LogChoice
